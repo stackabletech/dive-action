@@ -30,7 +30,7 @@ function format(output: string): string {
       ret.push(stripAnsi(line))
     } else if (inefficientFilesSection) {
       if (line.startsWith('Count')) {
-        ret.push('| Count | Wasted Space | File Paht |')
+        ret.push('| Count | Wasted Space | File Path |')
         ret.push('|---|---|---|')
       } else {
         // https://github.com/wagoodman/dive/blob/master/runtime/ci/evaluator.go#L140
@@ -47,11 +47,12 @@ async function run(): Promise<void> {
   try {
     const image = core.getInput('image')
     const configFile = core.getInput('config-file')
+    const diveImage = core.getInput('dive-image')
+    const reportOnly = Boolean(core.getInput('report-only'))
 
-    const diveImage = 'wagoodman/dive:v0.9'
     await exec.exec('docker', ['pull', diveImage])
 
-    const commandOptions = [
+    const dockerOptions = [
       '-e',
       'CI=true',
       '-e',
@@ -61,16 +62,28 @@ async function run(): Promise<void> {
       '/var/run/docker.sock:/var/run/docker.sock'
     ]
 
-    if (fs.existsSync(configFile)) {
-      commandOptions.push(
-        '--mount',
-        `type=bind,source=${configFile},target=/.dive-ci`,
-        '--ci-config',
-        '/.dive-ci'
-      )
+    const diveOptions = []
+
+    if (configFile && !fs.existsSync(configFile)) {
+      if (fs.existsSync(configFile)) {
+        dockerOptions.push(
+          '--mount',
+          `type=bind,source=${configFile},target=/.dive-ci`
+        )
+        diveOptions.push('--config-file', '/.dive-ci')
+      } else {
+        core.setFailed(`Dive configuration file ${configFile} doesn't exist!`)
+        return
+      }
     }
 
-    const parameters = ['run', ...commandOptions, diveImage, image]
+    const parameters = [
+      'run',
+      ...dockerOptions,
+      diveImage,
+      image,
+      ...diveOptions
+    ]
     let output = ''
     const execOptions = {
       ignoreReturnCode: true,
@@ -84,7 +97,8 @@ async function run(): Promise<void> {
       }
     }
     const exitCode = await exec.exec('docker', parameters, execOptions)
-    if (exitCode === 0) {
+
+    if (exitCode === 0 && !reportOnly) {
       // success
       return
     }
@@ -93,16 +107,20 @@ async function run(): Promise<void> {
     if (!token) {
       return
     }
+
     const octokit = github.getOctokit(token)
     const comment = {
       ...github.context.issue,
       issue_number: github.context.issue.number,
       body: format(output)
     }
-    await octokit.issues.createComment(comment)
-    core.setFailed(`Scan failed (exit code: ${exitCode})`)
+    await octokit.rest.issues.createComment(comment)
+
+    if (!reportOnly) {
+      core.setFailed(`Scan failed (exit code: ${exitCode})`)
+    }
   } catch (error) {
-    core.setFailed(error)
+    core.setFailed(String(error))
   }
 }
 

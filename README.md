@@ -1,10 +1,11 @@
 # dive action
 
 [![Release][release-badge]][release]
-[![GitHub Marketplace][marketplace-badge]][marketplace]
 [![License][license-badge]][license]
 
 !["./pr-comment.png"](pr-comment.png)
+
+NOTE: This was forked from https://github.com/yuichielectric/dive-action on 2023-07-06 because activity has stopped in the upstream repository. Our thanks go to the original author! 
 
 
 dive action is an action that allows developers who develop Docker image to run [dive](https://github.com/wagoodman/dive) on GitHub Actions. dive is a tool for exploring a docker image, layer contents, and discovering ways to shrink the size of your Docker/OCI image. Integrating dive into your CI will let you reduce your container image size as early as possible.
@@ -13,11 +14,14 @@ dive action is an action that allows developers who develop Docker image to run 
 
 ### Inputs
 
-| Name         | Type   | Required | Default                              | Description                                                                  |
-| ------------ | ------ | -------- | ------------------------------------ | ---------------------------------------------------------------------------- |
-| image        | String | true     |                                      | Image to analyze                                                             |
-| config-file  | String | false    | `${{ github.workspace }}/.dive.yaml` | Path to [dive config file](https://github.com/wagoodman/dive#ci-integration) |
-| github-token | String | false    |                                      | GitHub token to post PR comment on dive failure                              |
+| Name         | Type    | Required | Default              | Description                                                                                   |
+|--------------|---------|----------|----------------------|-----------------------------------------------------------------------------------------------|
+| config-file  | String  | false    |                      | Path to [dive config file](https://github.com/wagoodman/dive#ci-integration)                  |
+| dive-image   | false   | true     | wagoodman/dive:v0.10 | The Docker image to use for dive                                                              |
+| github-token | String  | false    |                      | GitHub token to post PR comment on dive failure                                               |
+| image        | String  | true     |                      | Image to analyze                                                                              |
+| report-only  | Boolean | false    | true                 | Whether to just report the results without failing the build (needs `github-token` to be set) |
+
 
 ### Workflow
 
@@ -36,10 +40,9 @@ jobs:
       - name: Build image
         run: docker build -t sample:latest .
       - name: Dive
-        uses: yuichielectric/dive-action@0.0.4
+        uses: stackabletech/dive-action@0.0.1
         with:
           image: "sample:latest"
-          config-file: ${{ github.workspace }}/.dive-ci.yml
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -131,9 +134,7 @@ Result:FAIL [Total:3] [Passed:2] [Failed:1] [Warn:0] [Skipped:0]
 ##[error]Process completed with exit code 1.
 ```
 
-[release]: https://github.com/yuichielectric/dive-action/releases/latest
-[release-badge]: https://img.shields.io/github/release/yuichielectric/dive-action.svg?logo=github&color=green
-[marketplace]: https://github.com/marketplace/actions/dive-action
-[marketplace-badge]: https://img.shields.io/badge/marketplace-dive--action-green?logo=github
-[license]: https://github.com/yuichielectric/dive-action/blob/master/LICENSE
-[license-badge]: https://img.shields.io/github/license/yuichielectric/dive-action.svg
+[release]: https://github.com/stackabletech/dive-action/releases/latest
+[release-badge]: https://img.shields.io/github/release/stackabletech/dive-action.svg?logo=github&color=green
+[license]: https://github.com/stackabletech/dive-action/blob/master/LICENSE
+[license-badge]: https://img.shields.io/github/license/stackabletech/dive-action.svg

@@ -1,6 +1,6 @@
 name: "Dive Action"
 description: "Run Dive to analyze the container image efficiency"
-author: "@yuichielectric"
+author: "@stackabletech"
 branding:
   icon: "aperture"
   color: "green"
@@ -11,10 +11,17 @@ inputs:
   config-file:
     description: "Path to dive config file"
     required: false
-    default: ${{ github.workspace }}/.dive.yaml
+  dive-image:
+    description: "Image of dive to use"
+    required: false
+    default: "wagoodman/dive:v0.10"
   github-token:
     description: "GitHub Token to post PR comment"
     required: true
+  report-only:
+    description: "If set to 'true' it will report the output no matter whether dive failed or not, this will never fail the build"
+    required: false
+    default: "true"
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
