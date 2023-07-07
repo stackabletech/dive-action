@@ -14,7 +14,7 @@ inputs:
   dive-image:
     description: "Image of dive to use"
     required: false
-    default: "wagoodman/dive:v0.10"
+    default: "wagoodman/dive:v0.11"
   github-token:
     description: "GitHub Token to post PR comment"
     required: true

@@ -17,7 +17,7 @@ dive action is an action that allows developers who develop Docker image to run 
 | Name         | Type    | Required | Default              | Description                                                                                   |
 |--------------|---------|----------|----------------------|-----------------------------------------------------------------------------------------------|
 | config-file  | String  | false    |                      | Path to [dive config file](https://github.com/wagoodman/dive#ci-integration)                  |
-| dive-image   | false   | true     | wagoodman/dive:v0.10 | The Docker image to use for dive                                                              |
+| dive-image   | false   | true     | wagoodman/dive:v0.11 | The Docker image to use for dive                                                              |
 | github-token | String  | false    |                      | GitHub token to post PR comment on dive failure                                               |
 | image        | String  | true     |                      | Image to analyze                                                                              |
 | report-only  | Boolean | false    | true                 | Whether to just report the results without failing the build (needs `github-token` to be set) |
