@@ -1,5 +1,5 @@
 {
-  "name": "dive-action",
+  "name": "stackable-dive-action",
   "version": "0.0.1",
   "private": true,
   "description": "GitHub Action for Dive",
