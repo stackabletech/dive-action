@@ -1,4 +1,4 @@
-name: "Dive Action"
+name: "Stackable Dive Action"
 description: "Run Dive to analyze the container image efficiency"
 author: "@stackabletech"
 branding:
